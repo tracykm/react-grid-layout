@@ -236,7 +236,7 @@ var ResponsiveReactGridLayout = (function(_React$Component) {
       this.props.cols !== cols
     ) {
       // Preserve the current layout if the current breakpoint is not present in the next layouts.
-      if (!(lastBreakpoint in layouts))
+      if (!(lastBreakpoint in newLayouts))
         newLayouts[lastBreakpoint] = (0, _utils.cloneLayout)(this.state.layout);
 
       // Find or generate a new layout.
