@@ -203,7 +203,7 @@ export default class ResponsiveReactGridLayout extends React.Component<
 
       // Find or generate a new layout.
       let layout = findOrGenerateResponsiveLayout(
-        layouts,
+        newLayouts,
         breakpoints,
         newBreakpoint,
         lastBreakpoint,
