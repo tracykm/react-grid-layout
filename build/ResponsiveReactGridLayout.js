@@ -169,7 +169,7 @@ var ResponsiveReactGridLayout = (function(_React$Component) {
     };
   };
 
-  ResponsiveReactGridLayout.prototype.componentWillReceiveProps = function componentWillReceiveProps(
+  ResponsiveReactGridLayout.prototype.UNSAFE_scomponentWillReceiveProps = function UNSAFE_scomponentWillReceiveProps(
     nextProps
   ) {
     // Allow parent to set width or breakpoint directly.
@@ -241,7 +241,7 @@ var ResponsiveReactGridLayout = (function(_React$Component) {
 
       // Find or generate a new layout.
       var _layout = (0, _responsiveUtils.findOrGenerateResponsiveLayout)(
-        layouts,
+        newLayouts,
         breakpoints,
         newBreakpoint,
         lastBreakpoint,
