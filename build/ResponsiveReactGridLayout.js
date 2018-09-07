@@ -227,7 +227,7 @@ var ResponsiveReactGridLayout = (function(_React$Component) {
       newBreakpoint,
       cols
     );
-    var newLayouts = _extends({}, layouts);
+    var newLayouts = JSON.parse(JSON.stringify(layouts));
 
     // Breakpoint change
     if (

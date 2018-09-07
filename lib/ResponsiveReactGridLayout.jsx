@@ -189,7 +189,7 @@ export default class ResponsiveReactGridLayout extends React.Component<
 
     const lastBreakpoint = this.state.breakpoint;
     const newCols: number = getColsFromBreakpoint(newBreakpoint, cols);
-    const newLayouts = { ...layouts };
+    const newLayouts = JSON.parse(JSON.stringify(layouts));
 
     // Breakpoint change
     if (
