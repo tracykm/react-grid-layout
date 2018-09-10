@@ -268,12 +268,12 @@ export default class ReactGridLayout extends React.Component<Props, State> {
       !isEqual(nextProps.layout, this.props.layout) ||
       nextProps.compactType !== this.props.compactType
     ) {
-      newLayoutBase = nextProps.layout;
+      newLayoutBase = [...nextProps.layout];
     } else if (!childrenEqual(this.props.children, nextProps.children)) {
       // If children change, also regenerate the layout. Use our state
       // as the base in case because it may be more up to date than
       // what is in props.
-      newLayoutBase = this.state.layout;
+      newLayoutBase = [...this.state.layout];
     }
 
     // We need to regenerate the layout.

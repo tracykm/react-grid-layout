@@ -129,14 +129,14 @@ var ReactGridLayout = (function(_React$Component) {
       !(0, _lodash2.default)(nextProps.layout, this.props.layout) ||
       nextProps.compactType !== this.props.compactType
     ) {
-      newLayoutBase = nextProps.layout;
+      newLayoutBase = [].concat(nextProps.layout);
     } else if (
       !(0, _utils.childrenEqual)(this.props.children, nextProps.children)
     ) {
       // If children change, also regenerate the layout. Use our state
       // as the base in case because it may be more up to date than
       // what is in props.
-      newLayoutBase = this.state.layout;
+      newLayoutBase = [].concat(this.state.layout);
     }
 
     // We need to regenerate the layout.
