@@ -119,7 +119,7 @@ var ReactGridLayout = (function(_React$Component) {
     this.onLayoutMaybeChanged(this.state.layout, this.props.layout);
   };
 
-  ReactGridLayout.prototype.UNSAFE_scomponentWillReceiveProps = function UNSAFE_scomponentWillReceiveProps(
+  ReactGridLayout.prototype.UNSAFE_componentWillReceiveProps = function UNSAFE_componentWillReceiveProps(
     nextProps
   ) {
     var newLayoutBase = void 0;
