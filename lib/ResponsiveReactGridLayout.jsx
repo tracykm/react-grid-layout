@@ -107,8 +107,8 @@ export default class ResponsiveReactGridLayout extends React.Component<
   };
 
   static defaultProps = {
-    breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
-    cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
+    breakpoints: { xl: 1800, lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
+    cols: { xl: 16, lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
     layouts: {},
     onBreakpointChange: noop,
     onLayoutChange: noop,
