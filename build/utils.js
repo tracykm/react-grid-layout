@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.noop = undefined;
+exports.createDragApiRef = exports.noop = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -92,6 +92,7 @@ function cloneLayoutItem(layoutItem) {
  * This will catch differences in keys, order, and length.
  */
 function childrenEqual(a, b) {
+  // $FlowIgnore: Appears to think map calls back w/array
   return (0, _lodash2.default)(_react2.default.Children.map(a, function (c) {
     return c.key;
   }), _react2.default.Children.map(b, function (c) {
@@ -103,7 +104,7 @@ function childrenEqual(a, b) {
  * Given two layoutitems, check if they collide.
  */
 function collides(l1, l2) {
-  if (l1.i === l2.i) return false; // same element
+  if (l1 === l2) return false; // same element
   if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
   if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
   if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
@@ -129,7 +130,7 @@ function compact(layout, compactType, cols) {
   var out = Array(layout.length);
 
   for (var _i3 = 0, len = sorted.length; _i3 < len; _i3++) {
-    var l = cloneLayoutItem(sorted[_i3]);
+    var l = sorted[_i3];
 
     // Don't move static elements
     if (!l.static) {
@@ -157,19 +158,14 @@ var heightWidth = { x: "w", y: "h" };
 function resolveCompactionCollision(layout, item, moveToCoord, axis) {
   var sizeProp = heightWidth[axis];
   item[axis] += 1;
-  var itemIndex = layout.map(function (layoutItem) {
-    return layoutItem.i;
-  }).indexOf(item.i);
+  var itemIndex = layout.indexOf(item);
 
   // Go through each item we collide with.
   for (var _i4 = itemIndex + 1; _i4 < layout.length; _i4++) {
     var otherItem = layout[_i4];
+
     // Ignore static items
     if (otherItem.static) continue;
-
-    // Optimization: we can break early if we know we're past this el
-    // We can do this b/c it's a sorted layout
-    if (otherItem.y > item.y + item.h) break;
 
     if (collides(item, otherItem)) {
       resolveCompactionCollision(layout, otherItem, moveToCoord + item[sizeProp], axis);
@@ -301,17 +297,17 @@ function getStatics(layout) {
  */
 function moveElement(layout, l, x, y, isUserAction, preventCollision, compactType, cols) {
   if (l.static) return layout;
+  log("Moving element " + l.i + " to [" + x + "," + y + "] from [" + l.x + "," + l.y + "]");
 
   // Short-circuit if nothing to do.
   if (l.y === y && l.x === x) return layout;
 
-  log("Moving element " + l.i + " to [" + String(x) + "," + String(y) + "] from [" + l.x + "," + l.y + "]");
   var oldX = l.x;
   var oldY = l.y;
 
   // This is quite a bit faster than extending the object
-  if (typeof x === 'number') l.x = x;
-  if (typeof y === 'number') l.y = y;
+  l.x = x;
+  l.y = y;
   l.moved = true;
 
   // If this collides with anything, move it.
@@ -319,7 +315,7 @@ function moveElement(layout, l, x, y, isUserAction, preventCollision, compactTyp
   // to ensure, in the case of multiple collisions, that we're getting the
   // nearest collision.
   var sorted = sortLayoutItems(layout, compactType);
-  var movingUp = compactType === "vertical" && typeof y === 'number' ? oldY >= y : compactType === "horizontal" && typeof x === 'number' ? oldX >= x : false;
+  var movingUp = compactType === "vertical" ? oldY >= y : compactType === "horizontal" ? oldX >= x : false;
   if (movingUp) sorted = sorted.reverse();
   var collisions = getAllCollisions(sorted, l);
 
@@ -361,34 +357,40 @@ function moveElement(layout, l, x, y, isUserAction, preventCollision, compactTyp
  */
 function moveElementAwayFromCollision(layout, collidesWith, itemToMove, isUserAction, compactType, cols) {
   var compactH = compactType === "horizontal";
-  // Compact vertically if not set to horizontal
-  var compactV = compactType !== "horizontal";
+  var compactV = compactType === "vertical";
   var preventCollision = false; // we're already colliding
 
   // If there is enough space above the collision to put this element, move it there.
   // We only do this on the main collision as this can get funky in cascades and cause
   // unwanted swapping behavior.
   if (isUserAction) {
-    // Reset isUserAction flag because we're not in the main collision anymore.
-    isUserAction = false;
-
     // Make a mock item so we don't modify the item here, only modify in moveElement.
     var fakeItem = {
       x: compactH ? Math.max(collidesWith.x - itemToMove.w, 0) : itemToMove.x,
-      y: compactV ? Math.max(collidesWith.y - itemToMove.h, 0) : itemToMove.y,
+      y: !compactH ? Math.max(collidesWith.y - itemToMove.h, 0) : itemToMove.y,
       w: itemToMove.w,
       h: itemToMove.h,
       i: "-1"
     };
 
+    // This makes it feel a bit more precise by waiting to swap for just a bit when moving up.
+
+    var _ref = compactType === "horizontal" ? ["x", "w"] : ["y", "h"],
+        axis = _ref[0],
+        dimension = _ref[1];
+
+    var shouldSkip = false &&
+    // Our collision is below the item to move, and only encroaches by 25% of its dimension; ignore
+    collidesWith[axis] > itemToMove[axis] && collidesWith[axis] - itemToMove[axis] > itemToMove[dimension] / 4;
+
     // No collision? If so, we can go up there; otherwise, we'll end up moving down as normal
-    if (!getFirstCollision(layout, fakeItem)) {
+    if (!shouldSkip && !getFirstCollision(layout, fakeItem)) {
       log("Doing reverse collision on " + itemToMove.i + " up to [" + fakeItem.x + "," + fakeItem.y + "].");
-      return moveElement(layout, itemToMove, compactH ? fakeItem.x : undefined, compactV ? fakeItem.y : undefined, isUserAction, preventCollision, compactType, cols);
+      return moveElement(layout, itemToMove, fakeItem.x, fakeItem.y, isUserAction, preventCollision, compactType, cols);
     }
   }
 
-  return moveElement(layout, itemToMove, compactH ? itemToMove.x + 1 : undefined, compactV ? itemToMove.y + 1 : undefined, isUserAction, preventCollision, compactType, cols);
+  return moveElement(layout, itemToMove, compactH ? collidesWith.x + collidesWith.w : itemToMove.x, compactV ? collidesWith.y + collidesWith.h : itemToMove.y, isUserAction, preventCollision, compactType, cols);
 }
 
 /**
@@ -401,11 +403,11 @@ function perc(num) {
   return num * 100 + "%";
 }
 
-function setTransform(_ref) {
-  var top = _ref.top,
-      left = _ref.left,
-      width = _ref.width,
-      height = _ref.height;
+function setTransform(_ref2) {
+  var top = _ref2.top,
+      left = _ref2.left,
+      width = _ref2.width,
+      height = _ref2.height;
 
   // Replace unitless items with px
   var translate = "translate(" + left + "px," + top + "px)";
@@ -421,11 +423,11 @@ function setTransform(_ref) {
   };
 }
 
-function setTopLeft(_ref2) {
-  var top = _ref2.top,
-      left = _ref2.left,
-      width = _ref2.width,
-      height = _ref2.height;
+function setTopLeft(_ref3) {
+  var top = _ref3.top,
+      left = _ref3.left,
+      width = _ref3.width,
+      height = _ref3.height;
 
   return {
     top: top + "px",
@@ -526,9 +528,8 @@ function synchronizeLayoutWithChildren(initialLayout, children, cols, compactTyp
  * @param  {String} [contextName] Context name for errors.
  * @throw  {Error}                Validation error.
  */
-function validateLayout(layout) {
-  var contextName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Layout";
-
+function validateLayout(layout, contextName) {
+  contextName = contextName || "Layout";
   var subProps = ["x", "y", "w", "h"];
   if (!Array.isArray(layout)) throw new Error(contextName + " must be an array!");
   for (var _i9 = 0, len = layout.length; _i9 < len; _i9++) {
@@ -563,3 +564,13 @@ function log() {
 }
 
 var noop = exports.noop = function noop() {};
+
+var createDragApiRef = exports.createDragApiRef = function createDragApiRef() {
+  var refObject = {
+    value: null
+  };
+  if (process.env.NODE_ENV !== "production") {
+    Object.seal(refObject);
+  }
+  return refObject;
+};

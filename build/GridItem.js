@@ -4,6 +4,8 @@ exports.__esModule = true;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+exports.calcXY = calcXY;
+
 var _react = require("react");
 
 var _react2 = _interopRequireDefault(_react);
@@ -30,9 +32,53 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+// Helper for generating column width
+function calcColWidth(props) {
+  var margin = props.margin,
+      containerPadding = props.containerPadding,
+      containerWidth = props.containerWidth,
+      cols = props.cols;
+
+  return (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols;
+}
+
+/**
+ * Translate x and y coordinates from pixels to grid units.
+ * @param  {Number} top  Top position (relative to parent) in pixels.
+ * @param  {Number} left Left position (relative to parent) in pixels.
+ * @return {Object} x and y in grid units.
+ */
+function calcXY(top, left, props) {
+  var margin = props.margin,
+      cols = props.cols,
+      rowHeight = props.rowHeight,
+      w = props.w,
+      h = props.h,
+      maxRows = props.maxRows;
+
+  var colWidth = calcColWidth(props);
+
+  // left = colWidth * x + margin * (x + 1)
+  // l = cx + m(x+1)
+  // l = cx + mx + m
+  // l - m = cx + mx
+  // l - m = x(c + m)
+  // (l - m) / (c + m) = x
+  // x = (left - margin) / (coldWidth + margin)
+  var x = Math.round((left - margin[0]) / (colWidth + margin[0]));
+  var y = Math.round((top - margin[1]) / (rowHeight + margin[1]));
+
+  // Capping
+  x = Math.max(Math.min(x, cols - w), 0);
+  y = Math.max(Math.min(y, maxRows - h), 0);
+
+  return { x: x, y: y };
+}
+
 /**
  * An individual item within a ReactGridLayout.
  */
+
 var GridItem = function (_React$Component) {
   _inherits(GridItem, _React$Component);
 
@@ -52,17 +98,6 @@ var GridItem = function (_React$Component) {
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
-  // Helper for generating column width
-  GridItem.prototype.calcColWidth = function calcColWidth() {
-    var _props = this.props,
-        margin = _props.margin,
-        containerPadding = _props.containerPadding,
-        containerWidth = _props.containerWidth,
-        cols = _props.cols;
-
-    return (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols;
-  };
-
   /**
    * Return position on the page given an x, y, w, h.
    * left, top, width, height are all in pixels.
@@ -72,15 +107,13 @@ var GridItem = function (_React$Component) {
    * @param  {Number}  h             H coordinate in grid units.
    * @return {Object}                Object containing coords.
    */
-
-
   GridItem.prototype.calcPosition = function calcPosition(x, y, w, h, state) {
-    var _props2 = this.props,
-        margin = _props2.margin,
-        containerPadding = _props2.containerPadding,
-        rowHeight = _props2.rowHeight;
+    var _props = this.props,
+        margin = _props.margin,
+        containerPadding = _props.containerPadding,
+        rowHeight = _props.rowHeight;
 
-    var colWidth = this.calcColWidth();
+    var colWidth = calcColWidth(this.props);
 
     var out = {
       left: Math.round((colWidth + margin[0]) * x + containerPadding[0]),
@@ -106,42 +139,6 @@ var GridItem = function (_React$Component) {
   };
 
   /**
-   * Translate x and y coordinates from pixels to grid units.
-   * @param  {Number} top  Top position (relative to parent) in pixels.
-   * @param  {Number} left Left position (relative to parent) in pixels.
-   * @return {Object} x and y in grid units.
-   */
-
-
-  GridItem.prototype.calcXY = function calcXY(top, left) {
-    var _props3 = this.props,
-        margin = _props3.margin,
-        cols = _props3.cols,
-        rowHeight = _props3.rowHeight,
-        w = _props3.w,
-        h = _props3.h,
-        maxRows = _props3.maxRows;
-
-    var colWidth = this.calcColWidth();
-
-    // left = colWidth * x + margin * (x + 1)
-    // l = cx + m(x+1)
-    // l = cx + mx + m
-    // l - m = cx + mx
-    // l - m = x(c + m)
-    // (l - m) / (c + m) = x
-    // x = (left - margin) / (coldWidth + margin)
-    var x = Math.round((left - margin[0]) / (colWidth + margin[0]));
-    var y = Math.round((top - margin[1]) / (rowHeight + margin[1]));
-
-    // Capping
-    x = Math.max(Math.min(x, cols - w), 0);
-    y = Math.max(Math.min(y, maxRows - h), 0);
-
-    return { x: x, y: y };
-  };
-
-  /**
    * Given a height and width in pixel values, calculate grid units.
    * @param  {Number} height Height in pixels.
    * @param  {Number} width  Width in pixels.
@@ -152,15 +149,15 @@ var GridItem = function (_React$Component) {
   GridItem.prototype.calcWH = function calcWH(_ref) {
     var height = _ref.height,
         width = _ref.width;
-    var _props4 = this.props,
-        margin = _props4.margin,
-        maxRows = _props4.maxRows,
-        cols = _props4.cols,
-        rowHeight = _props4.rowHeight,
-        x = _props4.x,
-        y = _props4.y;
+    var _props2 = this.props,
+        margin = _props2.margin,
+        maxRows = _props2.maxRows,
+        cols = _props2.cols,
+        rowHeight = _props2.rowHeight,
+        x = _props2.x,
+        y = _props2.y;
 
-    var colWidth = this.calcColWidth();
+    var colWidth = calcColWidth(this.props);
 
     // width = colWidth * w - (margin * (w - 1))
     // ...
@@ -187,10 +184,10 @@ var GridItem = function (_React$Component) {
 
 
   GridItem.prototype.createStyle = function createStyle(pos) {
-    var _props5 = this.props,
-        usePercentages = _props5.usePercentages,
-        containerWidth = _props5.containerWidth,
-        useCSSTransforms = _props5.useCSSTransforms;
+    var _props3 = this.props,
+        usePercentages = _props3.usePercentages,
+        containerWidth = _props3.containerWidth,
+        useCSSTransforms = _props3.useCSSTransforms;
 
 
     var style = void 0;
@@ -241,13 +238,13 @@ var GridItem = function (_React$Component) {
 
 
   GridItem.prototype.mixinResizable = function mixinResizable(child, position) {
-    var _props6 = this.props,
-        cols = _props6.cols,
-        x = _props6.x,
-        minW = _props6.minW,
-        minH = _props6.minH,
-        maxW = _props6.maxW,
-        maxH = _props6.maxH;
+    var _props4 = this.props,
+        cols = _props4.cols,
+        x = _props4.x,
+        minW = _props4.minW,
+        minH = _props4.minH,
+        maxW = _props4.maxW,
+        maxH = _props4.maxH;
 
     // This is the max possible width - doesn't go to infinity because of the width of the window
 
@@ -327,11 +324,11 @@ var GridItem = function (_React$Component) {
           throw new Error("onDragHandler called with unrecognized handlerName: " + handlerName);
       }
 
-      var _calcXY = _this2.calcXY(newPosition.top, newPosition.left),
+      var _calcXY = calcXY(newPosition.top, newPosition.left, _this2.props),
           x = _calcXY.x,
           y = _calcXY.y;
 
-      return handler.call(_this2, _this2.props.i, x, y, { e: e, node: node, newPosition: newPosition });
+      handler.call(_this2, _this2.props.i, x, y, { e: e, node: node, newPosition: newPosition });
     };
   };
 
@@ -354,14 +351,14 @@ var GridItem = function (_React$Component) {
 
       var handler = _this3.props[handlerName];
       if (!handler) return;
-      var _props7 = _this3.props,
-          cols = _props7.cols,
-          x = _props7.x,
-          i = _props7.i,
-          maxW = _props7.maxW,
-          minW = _props7.minW,
-          maxH = _props7.maxH,
-          minH = _props7.minH;
+      var _props5 = _this3.props,
+          cols = _props5.cols,
+          x = _props5.x,
+          i = _props5.i,
+          maxW = _props5.maxW,
+          minW = _props5.minW,
+          maxH = _props5.maxH,
+          minH = _props5.minH;
 
       // Get new XY
 
@@ -387,14 +384,14 @@ var GridItem = function (_React$Component) {
   };
 
   GridItem.prototype.render = function render() {
-    var _props8 = this.props,
-        x = _props8.x,
-        y = _props8.y,
-        w = _props8.w,
-        h = _props8.h,
-        isDraggable = _props8.isDraggable,
-        isResizable = _props8.isResizable,
-        useCSSTransforms = _props8.useCSSTransforms;
+    var _props6 = this.props,
+        x = _props6.x,
+        y = _props6.y,
+        w = _props6.w,
+        h = _props6.h,
+        isDraggable = _props6.isDraggable,
+        isResizable = _props6.isResizable,
+        useCSSTransforms = _props6.useCSSTransforms;
 
 
     var pos = this.calcPosition(x, y, w, h, this.state);
