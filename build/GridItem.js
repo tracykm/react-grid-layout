@@ -305,7 +305,6 @@ var GridItem = function (_React$Component) {
             var clientRect = node.getBoundingClientRect();
             newPosition.left = clientRect.left - parentRect.left + offsetParent.scrollLeft;
             newPosition.top = clientRect.top - parentRect.top + offsetParent.scrollTop;
-            console.log("drag start");
             _this2.setState({ dragging: newPosition });
             break;
           }
@@ -313,14 +312,12 @@ var GridItem = function (_React$Component) {
           if (!_this2.state.dragging) throw new Error("onDrag called before onDragStart.");
           newPosition.left = _this2.state.dragging.left + deltaX;
           newPosition.top = _this2.state.dragging.top + deltaY;
-          console.log("dragggggg");
           _this2.setState({ dragging: newPosition });
           break;
         case "onDragStop":
           if (!_this2.state.dragging) throw new Error("onDragEnd called before onDragStart.");
           newPosition.left = _this2.state.dragging.left;
           newPosition.top = _this2.state.dragging.top;
-          console.log("drag stop");
           _this2.setState({ dragging: null });
           break;
         default:
@@ -379,7 +376,6 @@ var GridItem = function (_React$Component) {
       // Min/max capping
       w = Math.max(Math.min(w, maxW), minW);
       h = Math.max(Math.min(h, maxH), minH);
-      console.log("resize");
       _this3.setState({ resizing: handlerName === "onResizeStop" ? null : size });
 
       handler.call(_this3, i, w, h, { e: e, node: node, size: size });
