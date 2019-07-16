@@ -408,7 +408,6 @@ export default class GridItem extends React.Component<Props, State> {
             clientRect.left - parentRect.left + offsetParent.scrollLeft;
           newPosition.top =
             clientRect.top - parentRect.top + offsetParent.scrollTop;
-          console.log("drag start");
           this.setState({ dragging: newPosition });
           break;
         }
@@ -417,7 +416,6 @@ export default class GridItem extends React.Component<Props, State> {
             throw new Error("onDrag called before onDragStart.");
           newPosition.left = this.state.dragging.left + deltaX;
           newPosition.top = this.state.dragging.top + deltaY;
-          console.log("dragggggg");
           this.setState({ dragging: newPosition });
           break;
         case "onDragStop":
@@ -425,7 +423,6 @@ export default class GridItem extends React.Component<Props, State> {
             throw new Error("onDragEnd called before onDragStart.");
           newPosition.left = this.state.dragging.left;
           newPosition.top = this.state.dragging.top;
-          console.log("drag stop");
           this.setState({ dragging: null });
           break;
         default:
@@ -468,7 +465,6 @@ export default class GridItem extends React.Component<Props, State> {
       // Min/max capping
       w = Math.max(Math.min(w, maxW), minW);
       h = Math.max(Math.min(h, maxH), minH);
-      console.log("resize");
       this.setState({ resizing: handlerName === "onResizeStop" ? null : size });
 
       handler.call(this, i, w, h, { e, node, size });
