@@ -376,6 +376,7 @@ var GridItem = function (_React$Component) {
       // Min/max capping
       w = Math.max(Math.min(w, maxW), minW);
       h = Math.max(Math.min(h, maxH), minH);
+
       _this3.setState({ resizing: handlerName === "onResizeStop" ? null : size });
 
       handler.call(_this3, i, w, h, { e: e, node: node, size: size });
@@ -406,8 +407,7 @@ var GridItem = function (_React$Component) {
         cssTransforms: useCSSTransforms
       }),
       // We can set the width and height on the child, but unfortunately we can't set the position.
-      style: _extends({}, this.props.style, child.props.style, this.createStyle(pos)),
-      "data-rgl-position": pos
+      style: _extends({}, this.props.style, child.props.style, this.createStyle(pos))
     });
 
     // Resizable support. This is usually on but the user can toggle it off.

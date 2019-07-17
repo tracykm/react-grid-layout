@@ -343,6 +343,7 @@ function moveElement(layout, l, x, y, isUserAction, preventCollision, compactTyp
       layout = moveElementAwayFromCollision(layout, l, collision, isUserAction, compactType, cols);
     }
   }
+
   return layout;
 }
 

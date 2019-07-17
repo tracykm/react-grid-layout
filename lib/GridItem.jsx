@@ -465,6 +465,7 @@ export default class GridItem extends React.Component<Props, State> {
       // Min/max capping
       w = Math.max(Math.min(w, maxW), minW);
       h = Math.max(Math.min(h, maxH), minH);
+
       this.setState({ resizing: handlerName === "onResizeStop" ? null : size });
 
       handler.call(this, i, w, h, { e, node, size });
@@ -504,8 +505,7 @@ export default class GridItem extends React.Component<Props, State> {
         ...this.props.style,
         ...child.props.style,
         ...this.createStyle(pos)
-      },
-      "data-rgl-position": pos
+      }
     });
 
     // Resizable support. This is usually on but the user can toggle it off.

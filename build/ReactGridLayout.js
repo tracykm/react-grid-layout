@@ -71,6 +71,7 @@ var ReactGridLayout = function (_React$Component) {
             position = _ref.position;
 
         dragInfo = { i: i, w: w, h: h, node: node };
+        var layout = _this2.state.layout;
         var _props = _this2.props,
             margin = _props.margin,
             containerPadding = _props.containerPadding;
@@ -90,22 +91,13 @@ var ReactGridLayout = function (_React$Component) {
 
         if (!_this2.state.activeDrag) {
           var l = { i: i, w: w, h: h, x: x, y: y };
-          var _oldLayout = JSON.parse(JSON.stringify(_this2.state.layout));
-          var _layout = [].concat(_this2.state.layout);
-          var item = (0, _utils.getLayoutItem)(_layout, i);
-          if (item) {
-            var isUserAction = true;
-            _layout = (0, _utils.moveElement)(_layout, item, x, y, isUserAction, _this2.props.preventCollision, _this2.compactType(), _this2.props.cols);
-          } else {
-            _layout = [].concat(_this2.state.layout, [l]);
-          }
           _this2.setState({
             oldDragItem: l,
-            oldLayout: _oldLayout,
-            layout: _layout,
+            oldLayout: layout,
+            layout: [].concat(_this2.state.layout, [l]),
             activeDrag: l
           });
-          _this2.props.onDragStart(_layout, l, l, null, event, node);
+          _this2.props.onDragStart(layout, l, l, null, event, node);
         } else {
           _this2.onDrag(i, x, y, { e: event, node: node, newPosition: position });
         }
@@ -184,9 +176,9 @@ var ReactGridLayout = function (_React$Component) {
     // We need to regenerate the layout.
     if (newLayoutBase) {
       var newLayout = (0, _utils.synchronizeLayoutWithChildren)(newLayoutBase, nextProps.children, nextProps.cols, this.compactType(nextProps));
-      var _oldLayout2 = this.state.layout;
+      var _oldLayout = this.state.layout;
       this.setState({ layout: newLayout });
-      this.onLayoutMaybeChanged(newLayout, _oldLayout2);
+      this.onLayoutMaybeChanged(newLayout, _oldLayout);
     }
   };
 

@@ -164,15 +164,8 @@ class AddRemoveLayout extends React.PureComponent {
           onDrag={this.dragPlaceholder}
           onStop={this.stopPlaceholder}
         >
-          <button
-            style={{
-              position: "relative",
-              zIndex: 1000,
-              width: "206px",
-              height: "310px"
-            }}
-          >
-            Drag external Item!!!
+          <button style={{ position: "relative", zIndex: 1000 }}>
+            Drag external Item
           </button>
         </Draggable>
         <div ref={node => (this.container = node)}>
