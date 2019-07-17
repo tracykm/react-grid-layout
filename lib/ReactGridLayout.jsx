@@ -414,7 +414,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
 
     this.setState({
       oldDragItem: cloneLayoutItem(l),
-      oldLayout: this.state.layout
+      oldLayout: JSON.parse(JSON.stringify(this.state.layout))
     });
 
     this.props.onDragStart(layout, l, l, null, e, node);
@@ -505,7 +505,6 @@ export default class ReactGridLayout extends React.Component<Props, State> {
       oldDragItem: null,
       oldLayout: null
     });
-
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
@@ -524,7 +523,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
 
     this.setState({
       oldResizeItem: cloneLayoutItem(l),
-      oldLayout: this.state.layout
+      oldLayout: JSON.parse(JSON.stringify(this.state.layout))
     });
 
     this.props.onResizeStart(layout, l, l, null, e, node);
