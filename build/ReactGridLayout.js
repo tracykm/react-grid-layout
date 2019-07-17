@@ -228,7 +228,7 @@ var ReactGridLayout = function (_React$Component) {
 
     this.setState({
       oldDragItem: (0, _utils.cloneLayoutItem)(l),
-      oldLayout: this.state.layout
+      oldLayout: JSON.parse(JSON.stringify(this.state.layout))
     });
 
     this.props.onDragStart(layout, l, l, null, e, node);
@@ -314,7 +314,6 @@ var ReactGridLayout = function (_React$Component) {
       oldDragItem: null,
       oldLayout: null
     });
-
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   };
 
@@ -336,7 +335,7 @@ var ReactGridLayout = function (_React$Component) {
 
     this.setState({
       oldResizeItem: (0, _utils.cloneLayoutItem)(l),
-      oldLayout: this.state.layout
+      oldLayout: JSON.parse(JSON.stringify(this.state.layout))
     });
 
     this.props.onResizeStart(layout, l, l, null, e, node);
