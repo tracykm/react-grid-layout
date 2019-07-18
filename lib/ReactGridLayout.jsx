@@ -309,14 +309,16 @@ export default class ReactGridLayout extends React.Component<Props, State> {
       dragOut: ({ event }) => {
         if (dragInfo) {
           const { i } = dragInfo;
-          this.setState((state, props) => ({
-            layout: compact(
-              state.layout.filter(d => d.i !== i),
-              this.compactType(),
-              props.cols
-            ),
+          const newLayout = compact(
+            this.state.layout.filter(d => d.i !== i),
+            this.compactType(),
+            this.props.cols
+          );
+          this.setState(() => ({
+            layout: newLayout,
             activeDrag: null
           }));
+          this.onLayoutMaybeChanged(newLayout, this.state.oldLayout);
         }
       },
 

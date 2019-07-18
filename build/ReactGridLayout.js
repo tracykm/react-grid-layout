@@ -118,14 +118,16 @@ var ReactGridLayout = function (_React$Component) {
           var _dragInfo = dragInfo,
               i = _dragInfo.i;
 
-          _this2.setState(function (state, props) {
+          var newLayout = (0, _utils.compact)(_this2.state.layout.filter(function (d) {
+            return d.i !== i;
+          }), _this2.compactType(), _this2.props.cols);
+          _this2.setState(function () {
             return {
-              layout: (0, _utils.compact)(state.layout.filter(function (d) {
-                return d.i !== i;
-              }), _this2.compactType(), props.cols),
+              layout: newLayout,
               activeDrag: null
             };
           });
+          _this2.onLayoutMaybeChanged(newLayout, _this2.state.oldLayout);
         }
       },
 
