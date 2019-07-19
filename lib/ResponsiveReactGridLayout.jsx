@@ -172,10 +172,14 @@ export default class ResponsiveReactGridLayout extends React.Component<
 
   // wrap layouts so we do not need to pass layouts to child
   onLayoutChange = (layout: Layout) => {
-    this.props.onLayoutChange(layout, {
-      ...this.props.layouts,
-      [this.state.breakpoint]: layout
-    });
+    this.props.onLayoutChange(
+      layout,
+      {
+        ...this.props.layouts,
+        [this.state.breakpoint]: layout
+      },
+      this.state.breakpoint
+    );
   };
 
   /**
@@ -224,7 +228,7 @@ export default class ResponsiveReactGridLayout extends React.Component<
       newLayouts[newBreakpoint] = layout;
 
       // callbacks
-      this.props.onLayoutChange(layout, newLayouts);
+      this.props.onLayoutChange(layout, newLayouts, this.state.breakpoint);
       this.props.onBreakpointChange(newBreakpoint, newCols);
 
       this.setState({
