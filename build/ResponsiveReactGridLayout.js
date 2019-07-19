@@ -53,7 +53,7 @@ var ResponsiveReactGridLayout = function (_React$Component) {
     return _ret = (_temp = (_this = _possibleConstructorReturn(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.state = _this.generateInitialState(), _this.onLayoutChange = function (layout) {
       var _extends2;
 
-      _this.props.onLayoutChange(layout, _extends({}, _this.props.layouts, (_extends2 = {}, _extends2[_this.state.breakpoint] = layout, _extends2)));
+      _this.props.onLayoutChange(layout, _extends({}, _this.props.layouts, (_extends2 = {}, _extends2[_this.state.breakpoint] = layout, _extends2)), _this.state.breakpoint);
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
   // This should only include propTypes needed in this code; RGL itself
@@ -137,7 +137,7 @@ var ResponsiveReactGridLayout = function (_React$Component) {
       newLayouts[newBreakpoint] = _layout;
 
       // callbacks
-      this.props.onLayoutChange(_layout, newLayouts);
+      this.props.onLayoutChange(_layout, newLayouts, this.state.breakpoint);
       this.props.onBreakpointChange(newBreakpoint, newCols);
 
       this.setState({
