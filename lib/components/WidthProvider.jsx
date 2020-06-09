@@ -59,7 +59,14 @@ export default function WidthProvider<
       if (!this.mounted) return;
       // eslint-disable-next-line
       const node = ReactDOM.findDOMNode(this); // Flow casts this to Text | Element
-      if (node instanceof HTMLElement)
+      if (
+        node instanceof HTMLElement &&
+        // to fix issue where it measures an empty div
+        (node.offsetWidth ||
+          // extra options just incase there is some weird reason why width=0, can still work if it has content
+          node.children.length ||
+          node.classList.contains("react-grid-layout"))
+      )
         this.setState({ width: node.offsetWidth });
     };
 
